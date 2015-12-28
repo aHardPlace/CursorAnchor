@@ -1,8 +1,12 @@
-# WinCenterCursor
-Centers the cursor when a key is pressed.
+# CursorAnchor
+Moves the cursor to an anchor point when a key is hit. Default is the center of the first screen.
 
-Uses F3 by default, but you can change it to anything you like by modifying line 8 of wincentercursor.cpp with any of the keycodes found here:
-*https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731*
+## Usage
+- **F2** records current mouse position
+- **F3** moves cursor to recorded position
 
-Current ideal compilation:
-`g++ wincentercursor.cpp -O3 -s -o wcc`
+Keys can be changed by modifying the GetAsyncKeyState() calls in CursorAnchor.cpp with any of the keycodes found here: [MSDN Virtual-Key Codes](https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731)
+
+## Building
+`$ make` includes an app icon.
+`$ make simple` does not.
