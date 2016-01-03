@@ -1,13 +1,13 @@
-/*	Cursor Anchor
+/*	
+ *	Cursor Anchor
  *
- * 	Moves the cursor to an anchor point when a key is hit.
- *	Default is the center of the first screen.
+ *	Moves the cursor to an anchor point when a key is hit.
  *
  *	Author: github.com/aHardPlace
  *	Version: 1.0
  *
- *  Title art generated at network-science.de/ascii
-*/	
+ *	Title art generated at network-science.de/ascii
+ */	
 
 #include <cstdio>
 #include <windows.h>
@@ -37,7 +37,7 @@ int main() {
 			GetCursorPos(&mouseAnchor);
 			printf("New anchor: %li, %li\n", mouseAnchor.x, mouseAnchor.y);
 		}
-		if (GetAsyncKeyState(VK_F3)) {
+		if (GetAsyncKeyState(VK_F3) & 1) {
 			SetCursorPos(mouseAnchor.x, mouseAnchor.y);
 		}
 

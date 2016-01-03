@@ -1,21 +1,21 @@
-CC	 = gcc
 CXX  = g++
-OBJS = 		\
-	resources.o	\
+EXE  = CursorAnchor.exe
+OBJS = \
+	resources.o    \
 	CursorAnchor.o
 
-COMPILER_FLAGS	= -s -O3
-WARNING_FLAGS	= -Wall -Wextra -pedantic
-EXE = CursorAnchor.exe
+CXXFLAGS  = -s -O3
+CXXFLAGS += -fno-exceptions -fno-rtti
+CXXFLAGS += -Wall -Wextra -pedantic
 
 all: $(OBJS)
-	$(CXX) -o $(EXE) $(OBJS) $(WARNING_FLAGS) $(COMPILER_FLAGS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(EXE)
 
 simple: CursorAnchor.o
-	$(CXX) -o $(EXE) CursorAnchor.o $(WARNING_FLAGS) $(COMPILER_FLAGS)
+	$(CXX) $(CXXFLAGS) CursorAnchor.o -o $(EXE)
 
 CursorAnchor.o: CursorAnchor.cpp
-	$(CXX) -c $< $(WARNING_FLAGS) $(COMPILER_FLAGS)
+	$(CXX) $(CXXFLAGS) -c $<
 
 resources.o: resources.rc
 	windres -i resources.rc -o resources.o
