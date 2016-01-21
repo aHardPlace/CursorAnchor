@@ -7,38 +7,104 @@
  *	Version: 1.0
  *
  *	Title art generated at network-science.de/ascii
- */	
+ */
 
-#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <vector>
+
 #include <windows.h>
+
+struct key {
+	std::string alias;
+	int code;
+};
 
 int main() {
 	SetConsoleTitle("Cursor Anchor");
-	puts("  ______  __    __ .______        _______.  ______  .______           ");
-	puts(" /      ||  |  |  ||   _  \\      /       | /  __  \\ |   _  \\       ");
-	puts("|  ,----'|  |  |  ||  |_)  |    |   (----`|  |  |  ||  |_)  |         ");
-	puts("|  |     |  |  |  ||      /      \\   \\    |  |  |  ||      /        ");
-	puts("|  `----.|  `--'  ||  |\\  \\-------)   |   |  `--'  ||  |\\  \\----. ");
-	puts(" \\______| \\______/ |__| `.___________/     \\______/ |__| `._____|  ");
-	puts("     ___      .__   __.  ______  __    __   ______  .______           ");
-	puts("    /   \\     |  \\ |  | /      ||  |  |  | /  __  \\ |   _  \\      ");
-	puts("   /  _  \\    |   \\|  ||  ,----'|  |__|  ||  |  |  ||  |_)  |       ");
-	puts("  /  /_\\  \\   |  . `  ||  |     |   __   ||  |  |  ||      /        ");
-	puts(" /  _____  \\  |  |\\   ||  `----.|  |  |  ||  `--'  ||  |\\  \\----. ");
-	puts("/__/     \\__\\ |__| \\__| \\______||__|  |__| \\______/ |__| `._____|");
-	puts("Listening...");
 
-	POINT mouseAnchor = { // center of first screen by default
-		GetSystemMetrics(SM_CXSCREEN) / 2, 
-		GetSystemMetrics(SM_CYSCREEN) / 2
-	};
-	while (true) {
-		if (GetAsyncKeyState(VK_F2) & 1) { // checking lowest bit stops spam unless button is held
-			GetCursorPos(&mouseAnchor);
-			printf("New anchor: %li, %li\n", mouseAnchor.x, mouseAnchor.y);
+	std::cout <<
+		"  ______  __    __  ______       _______   ______   ______           \n" \
+		" /      ||  |  |  ||   _  \\     /       | /  __  \\ |   _  \\       \n" \
+		"|  ,----'|  |  |  ||  |_)  |   |   (----`|  |  |  ||  |_)  |         \n" \
+		"|  |     |  |  |  ||      /     \\   \\    |  |  |  ||      /        \n" \
+		"|  `----.|  `--'  ||  |\\  \\------)   |   |  `--'  ||  |\\  \\----. \n" \
+		" \\______| \\______/ |__| `.__________/     \\______/ |__| `._____|  \n" \
+		"     ___      __   __   ______  __    __   ______   ______           \n" \
+		"    /   \\    |  \\ |  | /      ||  |  |  | /  __  \\ |   _  \\      \n" \
+		"   /  _  \\   |   \\|  ||  ,----'|  |__|  ||  |  |  ||  |_)  |       \n" \
+		"  /  /_\\  \\  |  . `  ||  |     |   __   ||  |  |  ||      /        \n" \
+		" /  _____  \\ |  |\\   ||  `----.|  |  |  ||  `--'  ||  |\\  \\----. \n" \
+		"/__/     \\__\\|__| \\__| \\______||__|  |__| \\______/ |__| `._____|\n"
+	<< std::endl;
+
+	key configKey;
+	std::vector<std::pair<key, POINT>> anchors;
+
+	{
+		std::ifstream configFile("anchors.cfg");
+		while (configFile) {
+			int nextChar = configFile.peek();
+			if (nextChar == '#' || nextChar == '\n') {
+				configFile.ignore(512, '\n');
+			}
+			else {
+				std::string type, alias;
+				int code;
+				configFile >> type >> alias >> std::hex >> code;
+				if (type == "anc") {
+					anchors.emplace_back(
+						key{
+							alias,
+							code
+						},
+						POINT{
+							GetSystemMetrics(SM_CXSCREEN) / 2, 
+							GetSystemMetrics(SM_CYSCREEN) / 2
+						}
+					);
+				}
+				else if (type == "cfg") {
+					configKey.alias = alias;
+					configKey.code = code;
+				}
+				else if (nextChar != EOF) {
+					std::cout << "Error reading config file." << std::endl;
+				}
+			}
 		}
-		if (GetAsyncKeyState(VK_F3) & 1) {
-			SetCursorPos(mouseAnchor.x, mouseAnchor.y);
+
+		configFile.close();
+	}
+
+	std::cout << "Configuration Key: " << configKey.alias << std::endl;
+	std::cout << "Anchors:" << std::endl;
+	for (auto entry: anchors) {
+		std::cout << '\t' << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
+	}
+	
+	while (true) {
+		for (auto &entry: anchors) {
+			if (GetAsyncKeyState(entry.first.code) & 1) { // checking lowest bit stops spam unless button is held
+				if (GetAsyncKeyState(configKey.code) & 1) {
+					POINT cursor;
+					GetCursorPos(&cursor);
+					entry.second.x = cursor.x;
+					entry.second.y = cursor.y;
+
+					HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+					COORD coord = {0, 13};
+					SetConsoleCursorPosition(hStdOut, coord);
+					std::cout << "Configuration Key: " << configKey.alias << std::endl;
+					std::cout << "Anchors:" << std::endl;
+					for (auto entry: anchors) {
+						std::cout << '\t' << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
+					}
+				}
+				else {
+					SetCursorPos(entry.second.x, entry.second.y);
+				}
+			}
 		}
 
 		Sleep(40); // sensibly arbitrary milliseconds

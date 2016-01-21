@@ -5,7 +5,7 @@ OBJS = \
 	CursorAnchor.o
 
 CXXFLAGS  = -s -O3
-CXXFLAGS += -fno-exceptions -fno-rtti
+CXXFLAGS += -std=c++11 -fno-exceptions -fno-rtti
 CXXFLAGS += -Wall -Wextra -pedantic
 
 all: $(OBJS)
