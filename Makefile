@@ -1,12 +1,12 @@
 CXX  = g++
 EXE  = CursorAnchor.exe
-OBJS = \
-	resources.o    \
+OBJS =				\
+	resources.o		\
 	CursorAnchor.o
 
 CXXFLAGS  = -s -O3
 CXXFLAGS += -std=c++11 -fno-exceptions -fno-rtti
-CXXFLAGS += -Wall -Wextra -pedantic
+CXXFLAGS += -Wall -Wextra -Weffc++ -pedantic
 
 all: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(EXE)

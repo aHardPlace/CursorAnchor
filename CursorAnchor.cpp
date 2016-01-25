@@ -38,7 +38,7 @@ int main() {
 		"/__/     \\__\\|__| \\__| \\______||__|  |__| \\______/ |__| `._____|\n"
 	<< std::endl;
 
-	key configKey;
+	key configKey{"NULL", -1};
 	std::vector<std::pair<key, POINT>> anchors;
 
 	{
@@ -65,8 +65,13 @@ int main() {
 					);
 				}
 				else if (type == "cfg") {
-					configKey.alias = alias;
-					configKey.code = code;
+					if (configKey.code == -1) {
+						configKey.alias = alias;
+						configKey.code = code;
+					}
+					else {
+						std::cout << "Ignoring multiple configuration key assignments." << std::endl;
+					}
 				}
 				else if (nextChar != EOF) {
 					std::cout << "Error reading config file." << std::endl;
@@ -77,12 +82,12 @@ int main() {
 		configFile.close();
 	}
 
-	std::cout << "Configuration Key: " << configKey.alias << std::endl;
-	std::cout << "Anchors:" << std::endl;
+	std::cout << "\tConfiguration Key: " << configKey.alias << std::endl;
+	std::cout << "\tAnchors:" << std::endl;
 	for (auto entry: anchors) {
-		std::cout << '\t' << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
+		std::cout << "\t\t" << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
 	}
-	
+
 	while (true) {
 		for (auto &entry: anchors) {
 			if (GetAsyncKeyState(entry.first.code) & 1) { // checking lowest bit stops spam unless button is held
@@ -95,10 +100,10 @@ int main() {
 					HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 					COORD coord = {0, 13};
 					SetConsoleCursorPosition(hStdOut, coord);
-					std::cout << "Configuration Key: " << configKey.alias << std::endl;
-					std::cout << "Anchors:" << std::endl;
+					std::cout << "\tConfiguration Key: " << configKey.alias << std::endl;
+					std::cout << "\tAnchors:" << std::endl;
 					for (auto entry: anchors) {
-						std::cout << '\t' << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
+						std::cout << "\t\t" << entry.first.alias << ": [ " << entry.second.x << ", " << entry.second.y << " ]    " << std::endl;
 					}
 				}
 				else {
