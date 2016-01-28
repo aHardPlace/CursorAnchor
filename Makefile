@@ -1,8 +1,8 @@
 CXX  = g++
-EXE  = CursorAnchor.exe
-OBJS =				\
-	resources.o		\
-	CursorAnchor.o
+EXE  = build\CursorAnchor.exe
+OBJS = \
+	build\resources.o		\
+	build\CursorAnchor.o
 
 CXXFLAGS  = -s -O3
 CXXFLAGS += -std=c++11 -fno-exceptions -fno-rtti
@@ -11,14 +11,14 @@ CXXFLAGS += -Wall -Wextra -Weffc++ -pedantic
 all: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(EXE)
 
-simple: CursorAnchor.o
+simple: build\CursorAnchor.o
 	$(CXX) $(CXXFLAGS) CursorAnchor.o -o $(EXE)
 
-CursorAnchor.o: CursorAnchor.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+build\CursorAnchor.o: src\CursorAnchor.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-resources.o: resources.rc
-	windres -i resources.rc -o resources.o
+build\resources.o: src\resources.rc
+	windres -i src\resources.rc -o build\resources.o
 
 clean:
 	del *.o && del $(EXE)

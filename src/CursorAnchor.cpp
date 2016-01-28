@@ -42,7 +42,11 @@ int main() {
 	std::vector<std::pair<key, POINT>> anchors;
 
 	{
-		std::ifstream configFile("anchors.cfg");
+		std::ifstream configFile("cfg\\anchors.cfg");
+		if (!configFile) {
+			std::cerr << "Failed to open config file \"res\\anchors.cfg\"" << std::endl;
+			return -1;
+		}
 		while (configFile) {
 			int nextChar = configFile.peek();
 			if (nextChar == '#' || nextChar == '\n') {
@@ -74,7 +78,7 @@ int main() {
 					}
 				}
 				else if (nextChar != EOF) {
-					std::cout << "Error reading config file." << std::endl;
+					std::cerr << "Error reading config file." << std::endl;
 				}
 			}
 		}
