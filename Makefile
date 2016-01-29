@@ -21,4 +21,4 @@ build\resources.o: src\resources.rc
 	windres -i src\resources.rc -o build\resources.o
 
 clean:
-	del *.o && del $(EXE)
+	del build\*.o && del $(EXE)
