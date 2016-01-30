@@ -18,14 +18,17 @@
 
 #include <windows.h>
 
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/document.h>
+#include <RapidJSON\StringBuffer.h>
+#include <RapidJSON\Document.h>
+#include <RapidJSON\PrettyWriter.h>
 
 class key {
 public:
-	key(): alias(), code() {}
+	key():
+		alias(),
+		code() {}
 
-	std::string alias;
+	const char *alias;
 	int code;
 };
 
@@ -68,11 +71,12 @@ public:
 		}
 		else {
 			char configBuffer[2048];
-			rapidjson::FileReadStream is(configFile, configBuffer, sizeof(configBuffer));
-			m_ConfigDocJSON.ParseStream(is);
+			fread(configBuffer, sizeof(char), 2048, configFile);
+			m_ConfigDocJSON.Parse(configBuffer);
 			fclose(configFile);
 		}
 
+		assert(m_ConfigDocJSON.IsObject());
 		assert(m_ConfigDocJSON.HasMember("configKey"));
 		assert(m_ConfigDocJSON.HasMember("anchors"));
 
@@ -101,6 +105,15 @@ public:
 		CONSOLE_SCREEN_BUFFER_INFO StdOutInfo;
 		GetConsoleScreenBufferInfo(m_StdOutHandle, &StdOutInfo);
 		m_PrintRow = StdOutInfo.dwCursorPosition.Y;
+	}
+	void WriteConfig(const char *file) {
+		FILE *JSONout = fopen(file, "wb");
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+		writer.SetIndent('\t', 1);
+		m_ConfigDocJSON.Accept(writer);
+		fputs(buffer.GetString(), JSONout);
+		fclose(JSONout);
 	}
 	void Poll() {
 		for (auto &entry: m_Anchors) {
